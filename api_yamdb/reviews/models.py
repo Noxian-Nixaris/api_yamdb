@@ -9,6 +9,9 @@ class Category(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(max_length=50)
 
+    def __str__(self):
+        return self.name
+
 
 class Title(models.Model):
     name = models.CharField(max_length=256)
@@ -18,8 +21,11 @@ class Title(models.Model):
         Category,
         null=True,
         on_delete=models.SET_NULL,
-        related_name='categories'
-        )
+        related_name='titles'
+    )
+
+    def __str__(self):
+        return self.name
 
 
 class Review(models.Model):
@@ -32,10 +38,16 @@ class Review(models.Model):
     class Meta:
         default_related_name = 'reviews'
 
+    def __str__(self):
+        return self.text
+
 
 class Genre(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(max_length=50)
+
+    def __str__(self):
+        return self.name
 
 
 class Comments(models.Model):
@@ -47,10 +59,14 @@ class Comments(models.Model):
     class Meta:
         default_related_name = 'comments'
 
+    def __str__(self):
+        return self.text
+
 
 class GenreTitle(models.Model):
-    title_id = models.ForeignKey(Title, on_delete=models.CASCADE)
-    genre_id = models.ForeignKey(Genre, null=True, on_delete=models.SET_NULL)
-
-    class Meta:
-        default_related_name = 'genre_title'
+    title_id = models.ForeignKey(
+        Title, on_delete=models.CASCADE, related_name='title'
+    )
+    genre_id = models.ForeignKey(
+        Genre, null=True, on_delete=models.SET_NULL, related_name='genre'
+    )
