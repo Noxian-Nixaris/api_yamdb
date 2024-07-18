@@ -11,7 +11,6 @@ User = get_user_model()
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    # category = SlugRelatedField(slug_field='slug')
 
     def validate_year(self, value):
         year = dt.date.today().year
