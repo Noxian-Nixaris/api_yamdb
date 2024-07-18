@@ -2,6 +2,7 @@ import datetime as dt
 
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework.relations import SlugRelatedField
 
 from reviews.models import Title
 
@@ -9,6 +10,7 @@ User = get_user_model()
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    # category = SlugRelatedField(slug_field='slug')
 
     def validate_year(self, value):
         year = dt.date.today().year
