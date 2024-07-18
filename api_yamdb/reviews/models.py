@@ -6,14 +6,16 @@ User = get_user_model()
 
 
 class Category(models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50)
+    slug = models.SlugField(max_length=50, unique=True)
 
     def __str__(self):
         return self.name
 
 
 class Title(models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=256)
     year = models.IntegerField()
     description = models.TextField(null=True, blank=True)
@@ -29,6 +31,7 @@ class Title(models.Model):
 
 
 class Review(models.Model):
+    id = models.AutoField(primary_key=True)
     text = models.TextField()
     title = models.ForeignKey(Title, on_delete=models.CASCADE)
     score = models.IntegerField()
@@ -43,6 +46,7 @@ class Review(models.Model):
 
 
 class Genre(models.Model):
+    id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=256)
     slug = models.SlugField(max_length=50)
 
@@ -51,6 +55,7 @@ class Genre(models.Model):
 
 
 class Comments(models.Model):
+    id = models.AutoField(primary_key=True)
     text = models.TextField()
     review = models.ForeignKey(Review, on_delete=models.CASCADE)
     pub_date = models.DateTimeField(auto_now_add=True)
@@ -64,6 +69,7 @@ class Comments(models.Model):
 
 
 class GenreTitle(models.Model):
+    id = models.AutoField(primary_key=True)
     title_id = models.ForeignKey(
         Title, on_delete=models.CASCADE, related_name='title'
     )
