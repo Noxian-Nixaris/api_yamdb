@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework import status
 
 from core.constants import NAME_MAX_LENGTH, SLUG_MAX_LENGTH
-from reviews.models import Category, Comments, Title, Review
+from reviews.models import Category, Comments, Genre, Title, Review
 
 
 User = get_user_model()
@@ -70,3 +70,10 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('text', 'title', 'score', 'pub_date', 'author')
         model = Review
+
+
+class GenreSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Genre
+        fields = ('name', 'slug')
