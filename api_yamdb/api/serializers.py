@@ -2,10 +2,11 @@ import datetime as dt
 
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework.relations import SlugRelatedField
+from rest_framework import status
 
-
+from core.constants import NAME_MAX_LENGTH, SLUG_MAX_LENGTH
 from reviews.models import Category, Title
+
 
 User = get_user_model()
 
@@ -30,3 +31,17 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
+
+    def validate_name(self, value):
+        if len(value) > NAME_MAX_LENGTH:
+            raise serializers.ValidationError(
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+        return value
+
+    def validate_slug(self, value):
+        if len(value) > SLUG_MAX_LENGTH and value == r'^[-a-zA-Z0-9_]+$':
+            raise serializers.ValidationError(
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+        return value
