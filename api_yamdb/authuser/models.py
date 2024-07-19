@@ -7,6 +7,7 @@ class User(AbstractUser):
         ('user', 'User'),
         ('moderator', 'Moderator'),
         ('admin', 'Admin'),
+        ('superuser', 'Superuser'),
     )
     email = models.EmailField(max_length=254, unique=True)
     username = models.CharField(max_length=150, unique=True)
@@ -15,6 +16,7 @@ class User(AbstractUser):
     confirmation_code = models.CharField(max_length=6, blank=True)
     role = models.CharField(max_length=26, choices=ROLES, default='user')
     bio = models.TextField(blank=True)
+    is_staff = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['username']
