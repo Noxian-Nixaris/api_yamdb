@@ -12,8 +12,8 @@ User = get_user_model()
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    category = serializers.StringRelatedField(many=True)
-    genre = 1
+    category = serializers.CharField(source='name')
+    genre = serializers.CharField(source='name')
 
     def validate_year(self, value):
         year = dt.date.today().year
@@ -23,14 +23,14 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ('name', 'year', 'description', 'category', 'genre')
+        fields = ('id', 'name', 'year', 'description', 'category', 'genre')
 
 
 class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = '__all__'
+        fields = ('name', 'slug')
 
     def validate_name(self, value):
         if len(value) > NAME_MAX_LENGTH:
