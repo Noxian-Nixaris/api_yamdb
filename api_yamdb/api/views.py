@@ -18,6 +18,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     ordering_fields = ('category', 'genre', 'name', 'year')
+    permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = CategoryPagination
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

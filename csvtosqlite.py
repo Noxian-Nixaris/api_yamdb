@@ -16,13 +16,13 @@ def load_data_from_csv():
             if file_name == 'users':
                 csv_file.to_sql(
                     'authuser_user',
-                    base, if_exists='replace',
+                    base, if_exists='append',
                     index=False
                 )
             else:
                 csv_file.to_sql(
                     f'reviews_{file_name}',
-                    base, if_exists='replace',
+                    base, if_exists='append',
                     index=False
                 )
         except Exception:
