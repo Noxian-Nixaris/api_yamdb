@@ -59,9 +59,6 @@ class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = CategoryPagination
-
-    # def destroy(self, request, *args, **kwargs):
-    #     obj = get_object_or_404(self.get_queryset(), slug=self.kwargs['slug'])
-    #     self.perform_destroy(obj)
-    #     return response.Response(status=status.HTTP_204_NO_CONTENT)
+    lookup_field = 'slug'
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['name']

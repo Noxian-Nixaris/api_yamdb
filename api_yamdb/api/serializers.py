@@ -1,7 +1,7 @@
 import datetime as dt
 
 from django.contrib.auth import get_user_model
-from rest_framework import serializers
+from rest_framework import relations, serializers
 from rest_framework import status
 
 from core.constants import NAME_MAX_LENGTH, SLUG_MAX_LENGTH
@@ -11,9 +11,19 @@ from reviews.models import Category, Comments, Genre, Title, Review
 User = get_user_model()
 
 
+class GenreSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Genre
+        fields = ('name', 'slug')
+
+
 class TitleSerializer(serializers.ModelSerializer):
-    category = serializers.StringRelatedField(many=True)
-    genre = 1
+    category = serializers.SlugRelatedField(many=True, slug_field='name', read_only=True)
+    genre = relations.SlugRelatedField(
+        slug_field='name',
+        queryset=Genre.objects.all()
+    )
 
     def validate_year(self, value):
         year = dt.date.today().year
@@ -70,10 +80,3 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('text', 'title', 'score', 'pub_date', 'author')
         model = Review
-
-
-class GenreSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Genre
-        fields = ('name', 'slug')
