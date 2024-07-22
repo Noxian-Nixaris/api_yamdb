@@ -71,8 +71,16 @@ class Comments(models.Model):
 class GenreTitle(models.Model):
     id = models.AutoField(primary_key=True)
     title_id = models.ForeignKey(
-        Title, on_delete=models.CASCADE, related_name='title'
+        Title, on_delete=models.CASCADE
     )
     genre_id = models.ForeignKey(
-        Genre, null=True, on_delete=models.SET_NULL, related_name='genre'
+        Genre, null=True, on_delete=models.SET_NULL
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('title_id', 'genre_id'), name='unique_genre_title'
+            )
+        ]
+        default_related_name = 'genre_title'
