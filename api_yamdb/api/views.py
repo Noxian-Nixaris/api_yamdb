@@ -20,6 +20,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     ordering_fields = ('category', 'genre', 'name', 'year')
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = CategoryPagination
+    ordering = ('name', 'id',)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -29,6 +30,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     search_fields = ('following__username',)
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = CategoryPagination
+    ordering = ('name', 'id',)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):

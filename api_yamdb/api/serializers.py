@@ -11,21 +11,6 @@ from reviews.models import Category, Comments, Genre, Title, Review
 User = get_user_model()
 
 
-class TitleSerializer(serializers.ModelSerializer):
-    category = serializers.CharField(source='name')
-    genre = serializers.CharField(source='name')
-
-    def validate_year(self, value):
-        year = dt.date.today().year
-        if value > year:
-            raise serializers.ValidationError()
-        return value
-
-    class Meta:
-        model = Title
-        fields = ('id', 'name', 'year', 'description', 'category', 'genre')
-
-
 class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -45,6 +30,21 @@ class CategorySerializer(serializers.ModelSerializer):
                 status_code=status.HTTP_400_BAD_REQUEST
             )
         return value
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True, many=True)
+    genre = serializers.CharField(source='name')  # переписать
+
+    def validate_year(self, value):
+        year = dt.date.today().year
+        if value > year:
+            raise serializers.ValidationError()
+        return value
+
+    class Meta:
+        model = Title
+        fields = ('id', 'name', 'year', 'description', 'category', 'genre')
 
 
 class CommentSerializer(serializers.ModelSerializer):
