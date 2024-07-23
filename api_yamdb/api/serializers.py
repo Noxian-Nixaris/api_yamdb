@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework import status
 
 from core.constants import NAME_MAX_LENGTH, SLUG_MAX_LENGTH
-from reviews.models import Category, Comments, Genre, Title, Review
+from reviews.models import Category, Comments, Genre, GenreTitle, Title, Review
 
 
 User = get_user_model()
@@ -32,13 +32,29 @@ class CategorySerializer(serializers.ModelSerializer):
         return value
 
 
+class GenreTitleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = GenreTitle
+        fields = ('title_id', 'genre_id')
+
+
 class TitleSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(read_only=True, many=True)
-    genre = serializers.CharField(source='name')  # переписать
+    category = serializers.SlugRelatedField(
+        slug_field='name',
+        queryset=Category.objects.all()
+    )
+    genre = GenreTitleSerializer(source='genre_id')
 
     def validate_year(self, value):
         year = dt.date.today().year
         if value > year:
+            raise serializers.ValidationError()
+        return value
+
+    def validate_category(self, value):
+        categories = Category.objects.all()
+        if value not in categories:
             raise serializers.ValidationError()
         return value
 

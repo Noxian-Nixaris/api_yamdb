@@ -64,7 +64,8 @@ class GenreViewSet(viewsets.ModelViewSet):
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = CategoryPagination
-
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)
     # def destroy(self, request, *args, **kwargs):
     #     obj = get_object_or_404(self.get_queryset(), slug=self.kwargs['slug'])
     #     self.perform_destroy(obj)
