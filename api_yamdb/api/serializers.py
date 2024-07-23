@@ -44,7 +44,7 @@ class TitleSerializer(serializers.ModelSerializer):
         slug_field='name',
         queryset=Category.objects.all()
     )
-    genre = GenreTitleSerializer(source='genre_id')
+    genre = GenreTitleSerializer(source='genre_id', many=True)
 
     def validate_year(self, value):
         year = dt.date.today().year
