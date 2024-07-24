@@ -18,15 +18,19 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     ordering_fields = ('category', 'genre', 'name', 'year')
+    permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = CategoryPagination
+    ordering = ('name', 'id',)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('following__username',)
+    search_fields = ('name',)
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = CategoryPagination
+    ordering = ('name', 'id',)
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -64,6 +68,6 @@ class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
-    lookup_field = 'slug'
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['name']
+    pagination_class = CategoryPagination
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('name',)

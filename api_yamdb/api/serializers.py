@@ -5,7 +5,7 @@ from rest_framework import relations, serializers
 from rest_framework import status
 
 from core.constants import CHOICES_SCORE, NAME_MAX_LENGTH, SLUG_MAX_LENGTH
-from reviews.models import Category, Comments, Genre, Title, Review
+from reviews.models import Category, Comments, Genre, GenreTitle, Title, Review
 
 
 User = get_user_model()
@@ -18,12 +18,40 @@ class GenreSerializer(serializers.ModelSerializer):
         fields = ('name', 'slug')
 
 
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = ('name', 'slug')
+
+    def validate_name(self, value):
+        if len(value) > NAME_MAX_LENGTH:
+            raise serializers.ValidationError(
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+        return value
+
+    def validate_slug(self, value):
+        if len(value) > SLUG_MAX_LENGTH and value == r'^[-a-zA-Z0-9_]+$':
+            raise serializers.ValidationError(
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+        return value
+
+
+class GenreTitleSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = GenreTitle
+        fields = ('title_id', 'genre_id')
+
+
 class TitleSerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(many=True, slug_field='name', read_only=True)
-    genre = relations.SlugRelatedField(
+    category = serializers.SlugRelatedField(
         slug_field='name',
-        queryset=Genre.objects.all()
+        queryset=Category.objects.all()
     )
+    genre = GenreTitleSerializer(source='genre_id', many=True)
     rating = serializers.SerializerMethodField()
 
     def get_rating(self, obj):
@@ -39,30 +67,15 @@ class TitleSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError()
         return value
 
+    def validate_category(self, value):
+        categories = Category.objects.all()
+        if value not in categories:
+            raise serializers.ValidationError()
+        return value
+
     class Meta:
         model = Title
-        fields = ('name', 'year', 'description', 'category', 'genre', 'rating')
-
-
-class CategorySerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Category
-        fields = '__all__'
-
-    def validate_name(self, value):
-        if len(value) > NAME_MAX_LENGTH:
-            raise serializers.ValidationError(
-                status_code=status.HTTP_400_BAD_REQUEST
-            )
-        return value
-
-    def validate_slug(self, value):
-        if len(value) > SLUG_MAX_LENGTH and value == r'^[-a-zA-Z0-9_]+$':
-            raise serializers.ValidationError(
-                status_code=status.HTTP_400_BAD_REQUEST
-            )
-        return value
+        fields = ('id', 'name', 'year', 'description', 'category', 'genre', 'rating')
 
 
 class CommentSerializer(serializers.ModelSerializer):
