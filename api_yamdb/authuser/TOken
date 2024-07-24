@@ -1,0 +1,32 @@
+class TokenView(generics.CreateAPIView):
+    serializer_class = TokenSerializer
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        username = data.get('username')
+        confirmation_code = data.get('confirmation_code')
+        if not username or not confirmation_code:
+            return Response({"Ошибка": "Не все поля заполнены."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({"Ошибка": "Пользователь не найден."},
+                            status=status.HTTP_404_NOT_FOUND)
+        if confirmation_code != 'expected_code':
+            return Response({"Ошибка": "Неверный код подтверждения."},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+class TokenView(generics.CreateAPIView):
+
+    def create(self, request, *args, **kwargs):
+        """Создание токена."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+
+        refresh = RefreshToken.for_user(user)
+        refresh.payload.update({'username': user.username})
+
+        return Response({'refresh': str(refresh), 'access': str(refresh.access_token)},
+                        status=status.HTTP_200_OK)
