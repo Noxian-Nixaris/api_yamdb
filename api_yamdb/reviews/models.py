@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from core.constants import CHOICES_SCORE
 
 User = get_user_model()
 
@@ -44,7 +45,7 @@ class Review(models.Model):
     id = models.AutoField(primary_key=True)
     text = models.TextField()
     title = models.ForeignKey(Title, on_delete=models.CASCADE)
-    score = models.IntegerField()
+    score = models.IntegerField(choices=CHOICES_SCORE)
     pub_date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
