@@ -1,5 +1,31 @@
 from rest_framework import serializers
+
 from .models import User
+
+
+class UserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name',
+                  'last_name', 'bio', 'role']
+
+    def validate_role(self, data):
+        request = self.context.get('request')
+        user = request.data
+        if 'role' not in user:
+            return data
+        if request.user.role not in ['admin']:
+            raise serializers.ValidationError("Изменение роли запрещено.")
+        return data
+
+
+class CreateUserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['username', 'email',
+                  'first_name', 'last_name', 'bio', 'role']
 
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -8,18 +34,14 @@ class SignUpSerializer(serializers.ModelSerializer):
         model = User
         fields = ('email', 'username')
 
-
-class TokenSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=150)
-    confirmation_code = serializers.CharField(max_length=50)
-
-    class Meta:
-        fields = ('username', 'confirmation_code')
+    def validate_username(self, username):
+        if username == 'me':
+            raise serializers.ValidationError("Недопустимое имя пользователя.")
+        return username
 
 
-class UserSerializer(serializers.ModelSerializer):
+class TokenSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'email',
-                  'first_name', 'last_name', 'role', 'bio')
+        fields = ('username', 'confirmation_code')
