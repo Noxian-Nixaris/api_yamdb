@@ -32,11 +32,29 @@ class CategorySerializer(serializers.ModelSerializer):
         return value
 
 
+class GenreSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Genre
+        fields = ('name', 'slug')
+
+
 class GenreTitleSerializer(serializers.ModelSerializer):
+    genre_id = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Genre.objects.all()
+    )
+    title_id = serializers.SlugRelatedField(
+        slug_field='name',
+        queryset=Title.objects.all()
+    )
 
     class Meta:
         model = GenreTitle
         fields = ('title_id', 'genre_id')
+    
+    def to_representation(self, value):
+        return str(value.genre_id.slug)
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -44,7 +62,7 @@ class TitleSerializer(serializers.ModelSerializer):
         slug_field='name',
         queryset=Category.objects.all()
     )
-    genre = GenreTitleSerializer(source='genre_id', many=True)
+    genre = GenreTitleSerializer(source='genre_title', many=True)
 
     def validate_year(self, value):
         year = dt.date.today().year
@@ -60,7 +78,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year', 'description', 'category', 'genre')
+        fields = ('name', 'year', 'description', 'category', 'genre')
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -86,10 +104,3 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('text', 'title', 'score', 'pub_date', 'author')
         model = Review
-
-
-class GenreSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Genre
-        fields = ('name', 'slug')

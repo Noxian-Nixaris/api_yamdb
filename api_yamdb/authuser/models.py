@@ -14,8 +14,8 @@ class User(AbstractUser):
         max_length=254,
         unique=True,
     )
-    first_name = models.CharField(max_length=150, blank=True)
-    last_name = models.CharField(max_length=150, blank=True)
+    first_name = models.CharField(max_length=150, null=True, blank=True)
+    last_name = models.CharField(max_length=150, null=True, blank=True)
     confirmation_code = models.CharField(
         max_length=6,
         blank=True
@@ -29,5 +29,5 @@ class User(AbstractUser):
         ),
         default='user'
     )
-    bio = models.TextField(blank=True)
+    bio = models.TextField(blank=True, null=True)
     is_staff = models.BooleanField(default=True)

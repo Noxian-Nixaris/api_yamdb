@@ -18,13 +18,13 @@ class Title(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=256)
     year = models.IntegerField()
-    description = models.TextField(null=True, blank=True)
     category = models.ForeignKey(
         Category,
         null=True,
         on_delete=models.SET_NULL,
         related_name='titles'
     )
+    description = models.TextField(null=True, default=None, blank=True)
 
     def __str__(self):
         return self.name
