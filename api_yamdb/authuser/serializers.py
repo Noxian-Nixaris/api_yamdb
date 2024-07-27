@@ -32,7 +32,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'username')
+        fields = ('email', 'username', 'confirmation_code')
 
     def validate_username(self, username):
         if username == 'me':
