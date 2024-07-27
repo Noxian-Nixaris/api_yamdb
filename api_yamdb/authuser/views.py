@@ -1,14 +1,16 @@
 from rest_framework import status, filters
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.views import APIView
 from rest_framework.mixins import (RetrieveModelMixin, CreateModelMixin,
                                    UpdateModelMixin, ListModelMixin,
                                    DestroyModelMixin)
+from random import randint
 
 from .models import User
-from .utils import send_confirmation_email, confirmation_code_generator
+from .utils import send_confirmation_email
 from .serializers import (UserSerializer, SignUpSerializer,
                           CreateUserSerializer, TokenSerializer)
 
@@ -104,16 +106,20 @@ class SignUpViewSet(GenericViewSet, CreateModelMixin):
                                       context={'request': request})
         email = request.data.get('email')
         username = request.data.get('username')
-        existing_username = User.objects.filter(username=username).first()
-        existing_email = User.objects.filter(email=email).first()
+        confirmation_code = str(randint(100000, 999999))
+        existing_username = User.objects.filter(username=username).exists()
+        existing_email = User.objects.filter(email=email).exists()
+        response_data = {'email': email,
+                         'username': username}
         if serializer.is_valid():
-            serializer.save()
-            send_confirmation_email(email, confirmation_code_generator)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            user = serializer.save()
+            user.confirmation_code = confirmation_code
+            user.save()
+            send_confirmation_email(email, confirmation_code)
+            return Response(response_data, status=status.HTTP_200_OK)
         if existing_username and existing_email:
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        if existing_email and existing_username:
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            send_confirmation_email(email, confirmation_code)
+            return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -122,12 +128,25 @@ class TokenView(APIView):
 
     def post(self, request, *args, **kwargs):
         """Создание токена."""
-        serializer = TokenSerializer(data=request.data, context={'request': request})
+        serializer = TokenSerializer(data=request.data,
+                                     context={'request': request})
+        username = request.data.get('username')
+        confirmation_code = request.data.get('confirmation_code')
+        existing_user = User.objects.filter(username=username).first()
+        if existing_user:
+            if confirmation_code != existing_user.confirmation_code:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            refresh = RefreshToken.for_user(existing_user)
+            token = {'refresh': str(refresh),
+                     'access': str(refresh.access_token)}
+            return Response(token, status=status.HTTP_200_OK)
         if serializer.is_valid():
-            serializer.save()
-            username = request.data.get('username')
+            user = serializer.save()
+            refresh = RefreshToken.for_user(user)
+            token = {'refresh': str(refresh),
+                     'access': str(refresh.access_token)}
             if username is not None:
                 return Response(status=status.HTTP_404_NOT_FOUND)
-            return Response(serializer.data,
-                            status=status.HTTP_200_OK)
+            return Response(token, status=status.HTTP_200_OK)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
