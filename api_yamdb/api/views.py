@@ -9,7 +9,7 @@ from api.serializers import (
     ReviewSerializer,
     TitleSerializer
 )
-from api_yamdb.permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
+from api_yamdb.permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly, IsModeratorOrReadOnly
 from api.pagination import CategoryPagination
 from reviews.models import Category, Comments, Genre, Review, Title
 
@@ -38,7 +38,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = (IsAuthorOrReadOnly, IsAdminOrReadOnly)
+    permission_classes = (IsAuthorOrReadOnly, IsAdminOrReadOnly, IsModeratorOrReadOnly)
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -56,7 +56,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     queryset = Comments.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = (IsAuthorOrReadOnly,)
+    permission_classes = (IsAuthorOrReadOnly, IsAdminOrReadOnly)
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
