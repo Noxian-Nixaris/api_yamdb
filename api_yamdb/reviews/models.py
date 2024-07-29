@@ -1,11 +1,21 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from core.constants import CHOICES_SCORE
 
 User = get_user_model()
 
 
 class Category(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=256)
+    slug = models.SlugField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Genre(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=256)
     slug = models.SlugField(max_length=50, unique=True)
@@ -34,24 +44,20 @@ class Review(models.Model):
     id = models.AutoField(primary_key=True)
     text = models.TextField()
     title = models.ForeignKey(Title, on_delete=models.CASCADE)
-    score = models.IntegerField()
+    score = models.IntegerField(choices=CHOICES_SCORE)
     pub_date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
         default_related_name = 'reviews'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('author', 'title'), name='unique_review'
+            )
+        ]
 
     def __str__(self):
         return self.text
-
-
-class Genre(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50, unique=True)
-
-    def __str__(self):
-        return self.name
 
 
 class Comments(models.Model):
