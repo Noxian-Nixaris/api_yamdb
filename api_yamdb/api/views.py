@@ -14,6 +14,16 @@ from api_yamdb.permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
 from api.pagination import CategoryPagination
 from reviews.models import Category, Comments, Genre, Review, Title
 
+import logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('main.log', mode='w'),
+        logging.StreamHandler()
+    ]
+)
+
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()

@@ -7,6 +7,16 @@ from rest_framework import status
 from core.constants import NAME_MAX_LENGTH, SLUG_MAX_LENGTH
 from reviews.models import Category, Comments, Genre, GenreTitle, Title, Review
 
+import logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('main.log', mode='w'),
+        logging.StreamHandler()
+    ]
+)
+
 
 User = get_user_model()
 
@@ -68,6 +78,7 @@ class TitleSerializer(serializers.ModelSerializer):
         year = dt.date.today().year
         if value > year:
             raise serializers.ValidationError()
+        logging.debug(F'{value}')
         return value
 
     def validate_category(self, value):
@@ -75,6 +86,9 @@ class TitleSerializer(serializers.ModelSerializer):
         if value not in categories:
             raise serializers.ValidationError()
         return value
+    
+    def to_representation(self, value):
+        return str(value.genre_id.slug)
 
     class Meta:
         model = Title

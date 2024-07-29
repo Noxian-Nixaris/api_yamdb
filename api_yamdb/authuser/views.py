@@ -110,15 +110,16 @@ class SignUpViewSet(GenericViewSet, CreateModelMixin):
         existing_username = User.objects.filter(username=username).exists()
         existing_email = User.objects.filter(email=email).exists()
         response_data = {'email': email,
-                         'username': username}
+                         'username': username,
+                         'confirmation_code': confirmation_code}
         if serializer.is_valid():
             user = serializer.save()
             user.confirmation_code = confirmation_code
             user.save()
-            send_confirmation_email(email, confirmation_code)
+            # send_confirmation_email(email, confirmation_code)
             return Response(response_data, status=status.HTTP_200_OK)
         if existing_username and existing_email:
-            send_confirmation_email(email, confirmation_code)
+            # send_confirmation_email(email, confirmation_code)
             return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
