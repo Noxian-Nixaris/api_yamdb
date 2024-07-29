@@ -1,14 +1,21 @@
 import datetime as dt
 
 from django.contrib.auth import get_user_model
-from rest_framework import serializers
+from rest_framework import relations, serializers
 from rest_framework import status
 
-from core.constants import NAME_MAX_LENGTH, SLUG_MAX_LENGTH
+from core.constants import CHOICES_SCORE, NAME_MAX_LENGTH, SLUG_MAX_LENGTH
 from reviews.models import Category, Comments, Genre, GenreTitle, Title, Review
 
 
 User = get_user_model()
+
+
+class GenreSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Genre
+        fields = ('name', 'slug')
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -45,6 +52,14 @@ class TitleSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all()
     )
     genre = GenreTitleSerializer(source='genre_id', many=True)
+    rating = serializers.SerializerMethodField()
+
+    def get_rating(self, obj):
+        reviews = obj.reviews.all()
+        if reviews.exists():
+            total_score = sum(review.score for review in reviews)
+            return total_score / reviews.count()
+        return 0
 
     def validate_year(self, value):
         year = dt.date.today().year
@@ -60,7 +75,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ('id', 'name', 'year', 'description', 'category', 'genre')
+        fields = ('id', 'name', 'year', 'description', 'category', 'genre', 'rating')
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -82,14 +97,15 @@ class ReviewSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )
+    score = serializers.ChoiceField(choices=CHOICES_SCORE)
 
     class Meta:
-        fields = ('text', 'title', 'score', 'pub_date', 'author')
+        fields = ('text', 'score', 'pub_date', 'author')
         model = Review
-
-
-class GenreSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Genre
-        fields = ('name', 'slug')
+        validators = [
+            serializers.UniqueTogetherValidator(
+                queryset=Review.objects.all(),
+                fields=['author', 'title'],
+                message="Вы уже оставили отзыв для этого тайтла"
+            )
+        ]

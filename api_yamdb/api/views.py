@@ -9,7 +9,7 @@ from api.serializers import (
     ReviewSerializer,
     TitleSerializer
 )
-from api_yamdb.permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly
+from api_yamdb.permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly, IsModeratorOrReadOnly
 from api.pagination import CategoryPagination
 from reviews.models import Category, Comments, Genre, Review, Title
 
@@ -38,12 +38,17 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = (IsAuthorOrReadOnly,)
+    permission_classes = (IsAuthorOrReadOnly, IsAdminOrReadOnly, IsModeratorOrReadOnly)
 
-    # def get_queryset(self):
-    #     title_id = self.kwargs.get('title_id')
-    #     title = get_object_or_404(Title, id=title_id)
-    #     return title.reviews.all()
+    def get_queryset(self):
+        title_id = self.kwargs.get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        return title.reviews.all()
+
+    def perform_create(self, serializer):
+        title_id = self.kwargs.get('title_id')
+        title = get_object_or_404(Title, id=title_id)
+        serializer.save(author=self.request.user, title=title)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -51,7 +56,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     queryset = Comments.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = (IsAuthorOrReadOnly,)
+    permission_classes = (IsAuthorOrReadOnly, IsAdminOrReadOnly)
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
@@ -66,7 +71,3 @@ class GenreViewSet(viewsets.ModelViewSet):
     pagination_class = CategoryPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    # def destroy(self, request, *args, **kwargs):
-    #     obj = get_object_or_404(self.get_queryset(), slug=self.kwargs['slug'])
-    #     self.perform_destroy(obj)
-    #     return response.Response(status=status.HTTP_204_NO_CONTENT)
