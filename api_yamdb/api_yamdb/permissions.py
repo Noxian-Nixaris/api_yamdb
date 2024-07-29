@@ -24,10 +24,11 @@ class IsAuthorOrReadOnly(BasePermission):
     Пользовательский класс разрешения, который
      позволяет изменения только автору объекта.
     """
+    SAFE_METHODS = list(SAFE_METHODS) + ['PUT']
 
     def has_object_permission(self, request, view, obj):
         return (
-            request.method in SAFE_METHODS
+            request.method in self.SAFE_METHODS
             or obj.author == request.user
         )
 
