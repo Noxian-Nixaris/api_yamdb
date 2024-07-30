@@ -1,21 +1,11 @@
 import datetime as dt
 
 from django.contrib.auth import get_user_model
-from rest_framework import relations, serializers
+from rest_framework import serializers
 from rest_framework import status
 
 from core.constants import CHOICES_SCORE, NAME_MAX_LENGTH, SLUG_MAX_LENGTH
 from reviews.models import Category, Comments, Genre, GenreTitle, Title, Review
-
-import logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('main.log', mode='w'),
-        logging.StreamHandler()
-    ]
-)
 
 
 User = get_user_model()
@@ -49,37 +39,27 @@ class CategorySerializer(serializers.ModelSerializer):
         return value
 
 
-class GenreSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Genre
-        fields = ('name', 'slug')
-
-
 class GenreTitleSerializer(serializers.ModelSerializer):
-    genre_id = serializers.SlugRelatedField(
+    genre = serializers.SlugRelatedField(
         slug_field='slug',
         queryset=Genre.objects.all()
     )
-    title_id = serializers.SlugRelatedField(
+    title = serializers.SlugRelatedField(
         slug_field='name',
         queryset=Title.objects.all()
     )
 
     class Meta:
         model = GenreTitle
-        fields = ('title_id', 'genre_id')
-    
+        fields = ('title', 'genre')
+
     def to_representation(self, value):
-        return str(value.genre_id.slug)
+        return str(value.genre.slug)
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    category = serializers.SlugRelatedField(
-        slug_field='name',
-        queryset=Category.objects.all()
-    )
-    genre = GenreTitleSerializer(source='genre_id', many=True)
+    category = CategorySerializer()
+    genre = GenreTitleSerializer(source='genre_title', many=True)
     rating = serializers.SerializerMethodField()
 
     def get_rating(self, obj):
@@ -89,25 +69,11 @@ class TitleSerializer(serializers.ModelSerializer):
             return total_score / reviews.count()
         return 0
 
-    def validate_year(self, value):
-        year = dt.date.today().year
-        if value > year:
-            raise serializers.ValidationError()
-        logging.debug(F'{value}')
-        return value
-
-    def validate_category(self, value):
-        categories = Category.objects.all()
-        if value not in categories:
-            raise serializers.ValidationError()
-        return value
-    
-    def to_representation(self, value):
-        return str(value.genre_id.slug)
-
     class Meta:
         model = Title
-        fields = ('name', 'year', 'description', 'category', 'genre', 'rating')
+        fields = (
+            'id', 'name', 'year', 'description', 'category', 'genre', 'rating'
+        )
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -141,3 +107,43 @@ class ReviewSerializer(serializers.ModelSerializer):
                 message="Вы уже оставили отзыв для этого тайтла"
             )
         ]
+
+
+class TitleCreateUpdateSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Category.objects.all()
+    )
+    genre = serializers.SlugRelatedField(
+        slug_field='slug',
+        queryset=Genre.objects.all(),
+        many=True
+    )
+    rating = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Title
+        fields = ('name', 'year', 'description', 'category', 'genre', 'rating')
+
+    def validate_year(self, value):
+        year = dt.date.today().year
+        if value > year:
+            raise serializers.ValidationError()
+        return value
+
+    def validate_category(self, value):
+        categories = Category.objects.all()
+        if value not in categories:
+            raise serializers.ValidationError()
+        return value
+
+    def create(self, validated_data):
+        genres_data = validated_data.pop('genre')
+        title = Title.objects.create(**validated_data)
+        for genre in genres_data:
+            if Genre.objects.filter(name=genre).exists:
+                GenreTitle.objects.create(title=title, genre=genre)
+        return title
+
+    def to_representation(self, instance):
+        return TitleSerializer(instance=instance).data

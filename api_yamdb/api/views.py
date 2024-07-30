@@ -1,28 +1,33 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import filters, response, status, viewsets
-from rest_framework.pagination import PageNumberPagination
-from api_yamdb.permissions import IsAdmin, IsAdminOrReadOnly, IsModerator
+from rest_framework import filters, viewsets
+from rest_framework.mixins import (
+    CreateModelMixin,
+    DestroyModelMixin,
+    ListModelMixin)
+from rest_framework.viewsets import GenericViewSet
+from api_yamdb.permissions import IsAdminOrReadOnly
 
 from api.serializers import (
     CategorySerializer,
     CommentSerializer,
     GenreSerializer,
     ReviewSerializer,
-    TitleSerializer
+    TitleSerializer,
+    TitleCreateUpdateSerializer
 )
-from api_yamdb.permissions import IsAdminOrReadOnly, IsAuthorOrReadOnly, IsModeratorOrReadOnly
+from api_yamdb.permissions import (
+    IsAdminOrReadOnly,
+    IsAuthorOrReadOnly,
+    IsModeratorOrReadOnly
+)
 from api.pagination import CategoryPagination
 from reviews.models import Category, Comments, Genre, Review, Title
 
-import logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('main.log', mode='w'),
-        logging.StreamHandler()
-    ]
-)
+
+class ListCreateDestroyViewSet(
+    CreateModelMixin, DestroyModelMixin, ListModelMixin, GenericViewSet
+):
+    pass
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -33,8 +38,13 @@ class TitleViewSet(viewsets.ModelViewSet):
     pagination_class = CategoryPagination
     ordering = ('name', 'id',)
 
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            return TitleCreateUpdateSerializer
+        return TitleSerializer
 
-class CategoryViewSet(viewsets.ModelViewSet):
+
+class CategoryViewSet(ListCreateDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
@@ -42,6 +52,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = CategoryPagination
     ordering = ('name', 'id',)
+    lookup_field = 'slug'
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -49,7 +60,9 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = (IsAuthorOrReadOnly, IsAdminOrReadOnly, IsModeratorOrReadOnly)
+    permission_classes = (
+        IsAuthorOrReadOnly, IsAdminOrReadOnly, IsModeratorOrReadOnly
+    )
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -75,10 +88,11 @@ class CommentViewSet(viewsets.ModelViewSet):
         return review.comments.all()
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(ListCreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = CategoryPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
+    lookup_field = 'slug'
