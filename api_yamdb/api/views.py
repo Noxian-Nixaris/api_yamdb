@@ -31,12 +31,15 @@ class ListCreateDestroyViewSet(
 
 
 class TitleViewSet(viewsets.ModelViewSet):
+    """Вьюсет для работы с произведениями"""
+
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     ordering_fields = ('category', 'genre', 'name', 'year')
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = CategoryPagination
     ordering = ('name', 'id',)
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
@@ -45,6 +48,8 @@ class TitleViewSet(viewsets.ModelViewSet):
 
 
 class CategoryViewSet(ListCreateDestroyViewSet):
+    """Вьюсет для работы с категориями"""
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
@@ -76,7 +81,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    """Вьюсет для работы с отзывами"""
+    """Вьюсет для работы с комментариями"""
 
     queryset = Comments.objects.all()
     serializer_class = CommentSerializer
@@ -89,6 +94,8 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 class GenreViewSet(ListCreateDestroyViewSet):
+    """Вьюсет для работы с жанрами"""
+
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
