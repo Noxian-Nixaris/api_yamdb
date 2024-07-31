@@ -12,6 +12,7 @@ User = get_user_model()
 
 
 class GenreSerializer(serializers.ModelSerializer):
+    """Сериализатор модели Genre"""
 
     class Meta:
         model = Genre
@@ -19,6 +20,7 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    """Сериализатор модели Category"""
 
     class Meta:
         model = Category
@@ -40,6 +42,8 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class GenreTitleSerializer(serializers.ModelSerializer):
+    """Сериализатор промежуточной модели GenreTitle"""
+
     genre = serializers.SlugRelatedField(
         slug_field='slug',
         queryset=Genre.objects.all()
@@ -58,6 +62,8 @@ class GenreTitleSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    """Сериализатор модели Title для отображения"""
+
     category = CategorySerializer()
     genre = GenreTitleSerializer(source='genre_title', many=True)
     rating = serializers.SerializerMethodField()
@@ -110,6 +116,8 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class TitleCreateUpdateSerializer(serializers.ModelSerializer):
+    """Сериализатор модели Title для внесения изменений"""
+
     category = serializers.SlugRelatedField(
         slug_field='slug',
         queryset=Category.objects.all()
@@ -124,6 +132,20 @@ class TitleCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = ('name', 'year', 'description', 'category', 'genre', 'rating')
+
+    def get_rating(self, obj):
+        reviews = obj.reviews.all()
+        if reviews.exists():
+            total_score = sum(review.score for review in reviews)
+            return total_score / reviews.count()
+        return 0
+
+    def validate_name(self, value):
+        if len(value) > NAME_MAX_LENGTH:
+            raise serializers.ValidationError(
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+        return value
 
     def validate_year(self, value):
         year = dt.date.today().year
