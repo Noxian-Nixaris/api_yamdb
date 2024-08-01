@@ -58,7 +58,7 @@ class GenreTitleSerializer(serializers.ModelSerializer):
         fields = ('title', 'genre')
 
     def to_representation(self, value):
-        return str(value.genre.slug)
+        return {'name': str(value.genre.name), 'slug': str(value.genre.slug)}
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -73,7 +73,7 @@ class TitleSerializer(serializers.ModelSerializer):
         if reviews.exists():
             total_score = sum(review.score for review in reviews)
             return total_score / reviews.count()
-        return 0
+        return None
 
     class Meta:
         model = Title
@@ -104,8 +104,9 @@ class ReviewSerializer(serializers.ModelSerializer):
     score = serializers.ChoiceField(choices=CHOICES_SCORE)
 
     class Meta:
-        fields = ('text', 'score', 'pub_date', 'author')
         model = Review
+        fields = ('text', 'score', 'pub_date', 'author', 'title')
+        read_only_fields = ('title',)
         validators = [
             serializers.UniqueTogetherValidator(
                 queryset=Review.objects.all(),
@@ -138,7 +139,7 @@ class TitleCreateUpdateSerializer(serializers.ModelSerializer):
         if reviews.exists():
             total_score = sum(review.score for review in reviews)
             return total_score / reviews.count()
-        return 0
+        return None
 
     def validate_name(self, value):
         if len(value) > NAME_MAX_LENGTH:

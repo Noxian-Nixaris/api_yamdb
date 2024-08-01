@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework.mixins import (
     CreateModelMixin,
@@ -34,8 +35,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с произведениями"""
 
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
-    ordering_fields = ('category', 'genre', 'name', 'year')
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('category', 'genre_title__genre__slug', 'name', 'year')
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = CategoryPagination
     ordering = ('name', 'id',)
@@ -83,7 +84,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с комментариями"""
 
-    queryset = Comments.objects.all()
     serializer_class = CommentSerializer
     permission_classes = (IsAuthorOrReadOnly, IsAdminOrReadOnly)
 
