@@ -90,30 +90,36 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ('text', 'review', 'pub_date', 'author')
+        fields = ('id', 'text', 'review', 'pub_date', 'author')
         model = Comments
-        read_only_fields = ('review',)
+        read_only_fields = ('review', 'pub_date', 'author')
 
 
 class ReviewSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Review"""
 
+    title = serializers.SlugRelatedField(
+        slug_field='name', read_only=True
+    )
     author = serializers.SlugRelatedField(
         read_only=True, slug_field='username'
     )
     score = serializers.ChoiceField(choices=CHOICES_SCORE)
 
     class Meta:
+        fields = ('id', 'text', 'score', 'pub_date', 'author', 'title')
         model = Review
-        fields = ('text', 'score', 'pub_date', 'author', 'title')
-        read_only_fields = ('title',)
-        validators = [
-            serializers.UniqueTogetherValidator(
-                queryset=Review.objects.all(),
-                fields=['author', 'title'],
-                message="Вы уже оставили отзыв для этого тайтла"
-            )
-        ]
+        read_only_fields = ('pub_date', 'title', 'author')
+
+    def validate_score(self, value):
+        if not isinstance(value, int) or not (1 <= value <= 10):
+            raise serializers.ValidationError('Оценка должна быть от 1 до 10')
+        return value
+
+    def validate_text(self, value):
+        if not value.strip():
+            raise serializers.ValidationError('Нельзя создать пустой отзыв')
+        return value
 
 
 class TitleCreateUpdateSerializer(serializers.ModelSerializer):
