@@ -19,27 +19,21 @@ class IsModerator(BasePermission):
                 and request.user.role == 'moderator')
 
 
-class IsAuthorOrReadOnly(BasePermission):
+class IsAuthModAdmOrReadOnly(BasePermission):
     """
     Пользовательский класс разрешения, который
-     позволяет изменения только автору объекта.
+     позволяет изменения автору, админу или модератору.
     """
-    SAFE_METHODS = list(SAFE_METHODS) + ['PUT']
+
+    def has_permission(self, request, view):
+        return (
+            request.method in SAFE_METHODS
+            or request.user.is_authenticated
+        )
 
     def has_object_permission(self, request, view, obj):
         return (
-            request.method in self.SAFE_METHODS
-            or obj.author == request.user
+            request.method in SAFE_METHODS
+            or obj.author == request.user or request.user.role == 'moderator'
+            or request.user.role == 'admin'
         )
-
-
-class IsModeratorOrReadOnly(BasePermission):
-    """
-    Пользовательский класс разрешения, который
-     позволяет изменения только модератеру и аутентифицированному пользователю.
-    """
-
-    def has_object_permission(self, request, view, obj):
-        return (request.method in SAFE_METHODS
-                or request.user.is_authenticated
-                and request.user.role == 'moderator')
