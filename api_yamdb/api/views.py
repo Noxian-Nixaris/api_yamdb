@@ -1,6 +1,4 @@
-from django.db import IntegrityError
-from django.shortcuts import get_object_or_404
-from rest_framework import exceptions, filters, permissions, viewsets
+from rest_framework import filters, viewsets
 from rest_framework.mixins import (
     CreateModelMixin,
     DestroyModelMixin,
@@ -30,9 +28,6 @@ class ListCreateDestroyViewSet(
 class TitleViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с произведениями."""
 
-    queryset = Title.objects.all()
-    serializer_class = TitleSerializer
-    ordering_fields = ('category', 'genre', 'name', 'year')
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = CategoryPagination
     ordering = ('name', 'id',)
@@ -42,6 +37,28 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'update', 'partial_update']:
             return TitleCreateUpdateSerializer
         return TitleSerializer
+
+    def get_queryset(self):
+        titles = Title.objects.all()
+        filters = self.request.query_params
+        print('*******', filters)
+        if 'genre' in filters:
+            filter_field = filters.get('genre')
+            titles = titles.filter(
+                genre_title__genre__slug=filter_field
+            )
+        if 'category' in filters:
+            filter_field = filters.get('category')
+            titles = titles.filter(category__slug=filter_field)
+        if 'name' in filters:
+            filter_field = filters.get('name')
+            titles = titles.filter(name=filter_field)
+        if 'year' in filters:
+            filter_field = filters.get('year')
+            titles = titles.filter(
+                year=filter_field
+            )
+        return titles
 
 
 class CategoryViewSet(ListCreateDestroyViewSet):

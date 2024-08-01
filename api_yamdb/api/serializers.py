@@ -58,7 +58,7 @@ class GenreTitleSerializer(serializers.ModelSerializer):
         fields = ('title', 'genre')
 
     def to_representation(self, value):
-        return str(value.genre.slug)
+        return {'name': str(value.genre.name), 'slug': str(value.genre.slug)}
 
 
 class TitleSerializer(serializers.ModelSerializer):
