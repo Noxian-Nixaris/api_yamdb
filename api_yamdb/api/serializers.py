@@ -51,7 +51,14 @@ class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор модели Title для отображения"""
 
     category = CategorySerializer()
-    genre = GenreTitleSerializer(source='genre_title', many=True)
+    # genre = serializers.SlugRelatedField(
+    #     slug_field='genre_title__genre__slug',
+    #     allow_empty=False,
+    #     queryset=Genre.objects.all(),
+    #     many=True
+    # )
+    genre = GenreSerializer(source='genre_title__genre__slug', many=True)
+    # genre = GenreTitleSerializer(source='genre_title', many=True)
     rating = serializers.SerializerMethodField()
 
     def get_rating(self, obj):
@@ -117,6 +124,8 @@ class TitleCreateUpdateSerializer(serializers.ModelSerializer):
     )
     genre = serializers.SlugRelatedField(
         slug_field='slug',
+        allow_null=False,
+        allow_empty=False,
         queryset=Genre.objects.all(),
         many=True
     )
