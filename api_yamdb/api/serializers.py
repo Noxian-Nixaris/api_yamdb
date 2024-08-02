@@ -116,10 +116,21 @@ class ReviewSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Оценка должна быть от 1 до 10')
         return value
 
-    def validate_text(self, value):
-        if not value.strip():
-            raise serializers.ValidationError('Нельзя создать пустой отзыв')
-        return value
+    def validate(self, data):
+        request = self.context['request']
+        author = request.user
+        title_id = self.context['view'].kwargs.get('title_id')
+        existing_review = Review.objects.filter(
+            author=author,
+            title_id=title_id
+        )
+        if request.method == 'PATCH':
+            return data
+        if existing_review.exists():
+            raise serializers.ValidationError(
+                'Вы уже оставили отзыв на это произведение'
+            )
+        return data
 
 
 class TitleCreateUpdateSerializer(serializers.ModelSerializer):

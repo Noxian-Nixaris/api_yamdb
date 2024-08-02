@@ -11,12 +11,9 @@ class PermissionMixin:
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return (permissions.AllowAny(),)
-        elif self.action == 'create':
-            return (permissions.IsAuthenticated(),)
-        elif self.action in ['partial_update', 'destroy']:
+        if self.action in ['partial_update', 'destroy']:
             return (IsAuthModAdmOrReadOnly(),)
-        else:
-            return (permissions.IsAuthenticated(),)
+        return (permissions.IsAuthenticated(),)
 
 
 class BaseGetQuerysetMixin:
@@ -37,7 +34,4 @@ class BaseCreateMixin:
     def perform_create(self, serializer, model, url_kwarg, related_field):
         obj_id = self.kwargs.get(url_kwarg)
         obj = get_object_or_404(model, id=obj_id)
-        try:
-            serializer.save(**{related_field: obj}, author=self.request.user)
-        except IntegrityError:
-            raise exceptions.ValidationError()
+        serializer.save(**{related_field: obj}, author=self.request.user)
