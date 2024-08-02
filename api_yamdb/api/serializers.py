@@ -26,20 +26,6 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ('name', 'slug')
 
-    def validate_name(self, value):
-        if len(value) > NAME_MAX_LENGTH:
-            raise serializers.ValidationError(
-                status_code=status.HTTP_400_BAD_REQUEST
-            )
-        return value
-
-    def validate_slug(self, value):
-        if len(value) > SLUG_MAX_LENGTH and value == r'^[-a-zA-Z0-9_]+$':
-            raise serializers.ValidationError(
-                status_code=status.HTTP_400_BAD_REQUEST
-            )
-        return value
-
 
 class GenreTitleSerializer(serializers.ModelSerializer):
     """Сериализатор промежуточной модели GenreTitle"""
@@ -58,13 +44,20 @@ class GenreTitleSerializer(serializers.ModelSerializer):
         fields = ('title', 'genre')
 
     def to_representation(self, value):
-        return str(value.genre.slug)
+        return {'name': str(value.genre.name), 'slug': str(value.genre.slug)}
 
 
 class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор модели Title для отображения"""
 
     category = CategorySerializer()
+    # genre = serializers.SlugRelatedField(
+    #     slug_field='genre_title__genre__slug',
+    #     allow_empty=False,
+    #     queryset=Genre.objects.all(),
+    #     many=True
+    # )
+    # genre = GenreSerializer(many=True)
     genre = GenreTitleSerializer(source='genre_title', many=True)
     rating = serializers.SerializerMethodField()
 
@@ -142,38 +135,19 @@ class TitleCreateUpdateSerializer(serializers.ModelSerializer):
     )
     genre = serializers.SlugRelatedField(
         slug_field='slug',
+        allow_null=False,
+        allow_empty=False,
         queryset=Genre.objects.all(),
         many=True
     )
-    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Title
-        fields = ('name', 'year', 'description', 'category', 'genre', 'rating')
-
-    def get_rating(self, obj):
-        reviews = obj.reviews.all()
-        if reviews.exists():
-            total_score = sum(review.score for review in reviews)
-            return total_score / reviews.count()
-        return None
-
-    def validate_name(self, value):
-        if len(value) > NAME_MAX_LENGTH:
-            raise serializers.ValidationError(
-                status_code=status.HTTP_400_BAD_REQUEST
-            )
-        return value
+        fields = ('name', 'year', 'description', 'category', 'genre')
 
     def validate_year(self, value):
         year = dt.date.today().year
         if value > year:
-            raise serializers.ValidationError()
-        return value
-
-    def validate_category(self, value):
-        categories = Category.objects.all()
-        if value not in categories:
             raise serializers.ValidationError()
         return value
 

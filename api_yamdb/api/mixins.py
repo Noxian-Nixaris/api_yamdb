@@ -2,7 +2,7 @@ from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
 from rest_framework import exceptions, permissions
 
-from api_yamdb.permissions import IsAuthModAdmOrReadOnly
+from .permissions import IsAuthModAdmOrReadOnly
 
 
 class PermissionMixin:
