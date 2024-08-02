@@ -15,7 +15,7 @@ from api.serializers import (
     TitleCreateUpdateSerializer,
     TitleSerializer
 )
-from api_yamdb.permissions import IsAdminOrReadOnly
+from api.permissions import IsAdminOrReadOnly
 from reviews.models import Category, Genre, Review, Title
 
 

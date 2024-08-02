@@ -19,9 +19,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'authuser',
-    'api',
     'reviews',
-    'api_yamdb',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -115,7 +114,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 AUTH_USER_MODEL = 'authuser.User'
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
 

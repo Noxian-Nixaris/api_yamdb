@@ -13,3 +13,4 @@ CHOICES_SCORE = (
     (9, '9'),
     (10, '10')
 )
+DISPLAY_LENGTH = 30
