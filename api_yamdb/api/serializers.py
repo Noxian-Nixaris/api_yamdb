@@ -57,8 +57,8 @@ class TitleSerializer(serializers.ModelSerializer):
     #     queryset=Genre.objects.all(),
     #     many=True
     # )
-    genre = GenreSerializer(source='genre_title__genre__slug', many=True)
-    # genre = GenreTitleSerializer(source='genre_title', many=True)
+    # genre = GenreSerializer(many=True)
+    genre = GenreTitleSerializer(source='genre_title', many=True)
     rating = serializers.SerializerMethodField()
 
     def get_rating(self, obj):
