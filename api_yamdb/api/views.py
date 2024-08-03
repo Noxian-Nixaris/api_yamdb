@@ -1,4 +1,5 @@
-from rest_framework import filters, viewsets
+from django.db.models import Avg
+from rest_framework import filters, permissions, viewsets
 from rest_framework.mixins import (
     CreateModelMixin,
     DestroyModelMixin,
@@ -26,10 +27,13 @@ class ListCreateDestroyViewSet(
     pass
 
 
+
 class TitleViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с произведениями."""
 
-    queryset = Title.objects.all()
+    queryset = Title.objects.annotate(
+        rating=Avg('reviews__score')
+    )
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = CategoryPagination
     ordering = ('name', 'id',)
@@ -87,6 +91,7 @@ class ReviewViewSet(
 
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_queryset(self):
@@ -105,6 +110,7 @@ class CommentViewSet(
     """Вьюсет для работы с комментариями."""
 
     serializer_class = CommentSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly)
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_queryset(self):
