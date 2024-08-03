@@ -17,17 +17,3 @@ class IsModerator(BasePermission):
     def has_permission(self, request, view):
         return (request.user.is_authenticated
                 and request.user.role == 'moderator')
-
-
-class IsAuthorOrReadOnly(BasePermission):
-    """
-    Пользовательский класс разрешения, который
-     позволяет изменения только автору объекта.
-    """
-    SAFE_METHODS = list(SAFE_METHODS) + ['PUT']
-
-    def has_object_permission(self, request, view, obj):
-        return (
-            request.method in self.SAFE_METHODS
-            or obj.author == request.user
-        )
