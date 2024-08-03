@@ -24,7 +24,7 @@ class ListCreateDestroyViewSet(
     CreateModelMixin, DestroyModelMixin, ListModelMixin, GenericViewSet
 ):
     pass
-from django_filters.rest_framework import DjangoFilterBackend
+
 
 class TitleViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с произведениями."""
@@ -35,6 +35,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     ordering = ('name', 'id',)
     http_method_names = ['get', 'post', 'patch', 'delete']
     filterset_class = (TitleFilter,)
+    filterser_fields = ('name', 'year', 'category', 'genre_title__genre__slug')
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
