@@ -14,3 +14,7 @@ CHOICES_SCORE = (
     (10, '10')
 )
 DISPLAY_LENGTH = 30
+MIN_SCORE = 1
+MAX_SCORE = 10
+ADMIN = "admin"
+MODERATOR = "moderator"
