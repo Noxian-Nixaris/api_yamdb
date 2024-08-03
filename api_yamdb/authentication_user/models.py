@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from .constants import (
+from core.constants import (
     MAX_LENGTH, EMAIL_MAX_LENGTH, CONFIRMATION_CODE_MAX_LENGTH,
     ROLE_MAX_LENGTH, PATTERN_VALIDATOR, username_not_me_validator,
     ROLE_USER, ROLE_MODERATOR, ROLE_ADMIN
