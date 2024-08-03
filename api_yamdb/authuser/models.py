@@ -1,3 +1,5 @@
+from random import randint
+
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
@@ -18,7 +20,8 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=150, null=True, blank=True)
     confirmation_code = models.CharField(
         max_length=6,
-        blank=True
+        blank=True,
+        default=randint(100000, 999999)
     )
     role = models.CharField(
         max_length=26,

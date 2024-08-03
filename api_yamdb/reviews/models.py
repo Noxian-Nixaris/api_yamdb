@@ -6,16 +6,6 @@ from core.constants import CHOICES_SCORE, DISPLAY_LENGTH, NAME_MAX_LENGTH
 User = get_user_model()
 
 
-# class BaseClass(models.Model):
-#     name = models.CharField(max_length=NAME_MAX_LENGTH)
-#     slug = models.SlugField(unique=True)
-#     class Meta:
-#         pass
-
-#     def __str__(self):
-#         return self.name[:DISPLAY_LENGTH]
-
-
 class Category(models.Model):
     name = models.CharField(max_length=NAME_MAX_LENGTH)
     slug = models.SlugField(unique=True)
