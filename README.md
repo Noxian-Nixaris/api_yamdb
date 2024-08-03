@@ -37,7 +37,10 @@ pip install -r requirements.txt
 ```
 python3 manage.py migrate
 ```
-
+Заполнить базу данных из csv:
+```
+python3 manage.py csv csv_to_db
+```
 Запустить проект:
 ```
 python3 manage.py runserver
