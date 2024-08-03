@@ -6,38 +6,34 @@ from core.constants import CHOICES_SCORE, DISPLAY_LENGTH, NAME_MAX_LENGTH
 User = get_user_model()
 
 
-# class BaseClass(models.Model):
-#     name = models.CharField(max_length=NAME_MAX_LENGTH)
-#     slug = models.SlugField(unique=True)
-#     class Meta:
-#         pass
+class BaseModelClass(models.Model):
+    name = models.CharField(max_length=NAME_MAX_LENGTH)
+    slug = models.SlugField(unique=True)
 
-#     def __str__(self):
-#         return self.name[:DISPLAY_LENGTH]
+    def __str__(self):
+        return self.name[:DISPLAY_LENGTH]
+
+
+class ReviewCommentBaseModel(models.Model):
+    text = models.TextField()
+    pub_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.text
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=NAME_MAX_LENGTH)
-    slug = models.SlugField(unique=True)
 
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
-    def __str__(self):
-        return self.name[:DISPLAY_LENGTH]
-
 
 class Genre(models.Model):
-    name = models.CharField(max_length=NAME_MAX_LENGTH)
-    slug = models.SlugField(unique=True)
 
     class Meta:
         verbose_name = 'Жанр'
         verbose_name_plural = 'Жанры'
-
-    def __str__(self):
-        return self.name[:DISPLAY_LENGTH]
 
 
 class Title(models.Model):
@@ -61,10 +57,8 @@ class Title(models.Model):
 
 
 class Review(models.Model):
-    text = models.TextField()
     title = models.ForeignKey(Title, on_delete=models.CASCADE)
     score = models.PositiveSmallIntegerField(choices=CHOICES_SCORE)
-    pub_date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
@@ -78,23 +72,15 @@ class Review(models.Model):
             )
         ]
 
-    def __str__(self):
-        return self.text
-
 
 class Comments(models.Model):
-    text = models.TextField()
     review = models.ForeignKey(Review, on_delete=models.CASCADE)
-    pub_date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
         default_related_name = 'comments'
-
-    def __str__(self):
-        return self.text
 
 
 class GenreTitle(models.Model):
