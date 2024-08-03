@@ -17,11 +17,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
     'rest_framework_simplejwt',
     'authentication_user',
-    'api',
     'reviews',
-    'api_yamdb',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -63,7 +63,7 @@ LOGGING = {
 
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
-    
+
     'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
 
     'REFRESH_TOKEN_LIFETIME': timedelta(days=60),
@@ -118,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'authentication_user.User'
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
 

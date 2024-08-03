@@ -1,33 +1,39 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from core.constants import CHOICES_SCORE
+from core.constants import CHOICES_SCORE, DISPLAY_LENGTH, NAME_MAX_LENGTH
 
 User = get_user_model()
 
 
 class Category(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50, unique=True)
+    name = models.CharField(max_length=NAME_MAX_LENGTH)
+    slug = models.SlugField(unique=True)
+
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
 
     def __str__(self):
-        return self.name
+        return self.name[:DISPLAY_LENGTH]
 
 
 class Genre(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(max_length=50, unique=True)
+    name = models.CharField(max_length=NAME_MAX_LENGTH)
+    slug = models.SlugField(unique=True)
+
+    class Meta:
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
 
     def __str__(self):
-        return self.name
+        return self.name[:DISPLAY_LENGTH]
 
 
 class Title(models.Model):
     id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=256)
-    year = models.IntegerField()
+    name = models.CharField(max_length=NAME_MAX_LENGTH)
+    year = models.SmallIntegerField()
     category = models.ForeignKey(
         Category,
         null=True,
@@ -36,19 +42,25 @@ class Title(models.Model):
     )
     description = models.TextField(null=True, default=None, blank=True)
 
+    class Meta:
+        verbose_name = 'Тайтл'
+        verbose_name_plural = 'Тайтлы'
+
     def __str__(self):
         return self.name
 
 
 class Review(models.Model):
-    id = models.AutoField(primary_key=True)
     text = models.TextField()
     title = models.ForeignKey(Title, on_delete=models.CASCADE)
-    score = models.IntegerField(choices=CHOICES_SCORE)
+    score = models.PositiveSmallIntegerField(choices=CHOICES_SCORE)
     pub_date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+
         default_related_name = 'reviews'
         constraints = [
             models.UniqueConstraint(
@@ -61,13 +73,14 @@ class Review(models.Model):
 
 
 class Comments(models.Model):
-    id = models.AutoField(primary_key=True)
     text = models.TextField()
     review = models.ForeignKey(Review, on_delete=models.CASCADE)
     pub_date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
         default_related_name = 'comments'
 
     def __str__(self):
@@ -75,7 +88,6 @@ class Comments(models.Model):
 
 
 class GenreTitle(models.Model):
-    id = models.AutoField(primary_key=True)
     title = models.ForeignKey(
         Title, on_delete=models.CASCADE
     )
