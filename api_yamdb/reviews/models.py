@@ -65,7 +65,7 @@ class Title(models.Model):
         verbose_name_plural = 'Тайтлы'
 
     def __str__(self):
-        return self.name
+        return self.name[:DISPLAY_LENGTH]
 
 
 class Review(models.Model):
