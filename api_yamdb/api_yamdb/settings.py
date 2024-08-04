@@ -19,7 +19,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'rest_framework_simplejwt',
-    'authuser',
+    'authentication_user',
     'reviews',
     'api',
 ]
@@ -71,6 +71,8 @@ SIMPLE_JWT = {
 
 }
 
+EMAIL_HOST_USER = 'api_yamdb79@tutamail.com'
+
 ROOT_URLCONF = 'api_yamdb.urls'
 
 TEMPLATES_DIR = BASE_DIR / 'templates'
@@ -114,7 +116,8 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-AUTH_USER_MODEL = 'authuser.User'
+
+AUTH_USER_MODEL = 'authentication_user.User'
 
 LANGUAGE_CODE = 'ru-RU'
 
