@@ -2,9 +2,10 @@ import datetime as dt
 
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework import status
 
-from core.constants import CHOICES_SCORE, MAX_SCORE, MIN_SCORE, NAME_MAX_LENGTH, SLUG_MAX_LENGTH
+from core.constants import (
+    CHOICES_SCORE, MAX_SCORE, MIN_SCORE, NAME_MAX_LENGTH, SLUG_MAX_LENGTH
+)
 from reviews.models import Category, Comments, Genre, GenreTitle, Title, Review
 
 

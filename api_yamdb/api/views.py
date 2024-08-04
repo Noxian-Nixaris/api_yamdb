@@ -25,25 +25,19 @@ from reviews.models import Category, Genre, Review, Title
 class ListCreateDestroyViewSet(
     CreateModelMixin, DestroyModelMixin, ListModelMixin, GenericViewSet
 ):
-    pass
-
-
-class BaseViewSetClass(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     pagination_class = CategoryPagination
-    ordering = ('name', 'id',)
 
 
-
-class TitleViewSet(BaseViewSetClass):
+class TitleViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с произведениями."""
 
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
     ).order_by('name')
-    # permission_classes = (IsAdminOrReadOnly,)
-    # pagination_class = CategoryPagination
-    # ordering = ('name', 'id',)
+    permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = CategoryPagination
+    ordering = ('name', 'id',)
     http_method_names = ['get', 'post', 'patch', 'delete']
     filterset_class = TitleFilter
     filter_backends = (filters.OrderingFilter, DjangoFilterBackend)
@@ -54,7 +48,7 @@ class TitleViewSet(BaseViewSetClass):
         return TitleSerializer
 
 
-class CategoryViewSet(BaseViewSetClass):
+class CategoryViewSet(ListCreateDestroyViewSet):
     """Вьюсет для работы с категориями."""
 
     queryset = Category.objects.all()
@@ -63,7 +57,7 @@ class CategoryViewSet(BaseViewSetClass):
     search_fields = ('name',)
     # permission_classes = (IsAdminOrReadOnly,)
     # pagination_class = CategoryPagination
-    # ordering = ('name', 'id',)
+    ordering = ('name', 'id',)
     lookup_field = 'slug'
 
 
@@ -106,7 +100,7 @@ class CommentViewSet(
         super().perform_create(serializer, Review, 'review_id', 'review')
 
 
-class GenreViewSet(ListCreateDestroyViewSet, BaseViewSetClass):
+class GenreViewSet(ListCreateDestroyViewSet):
     """Вьюсет для работы с жанрами."""
 
     queryset = Genre.objects.all()
