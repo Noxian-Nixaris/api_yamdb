@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from core.constants import (
-    CHOICES_SCORE, MAX_SCORE, MIN_SCORE, NAME_MAX_LENGTH, SLUG_MAX_LENGTH
+    CHOICES_SCORE, MAX_SCORE, MIN_SCORE
 )
 from reviews.models import Category, Comments, Genre, GenreTitle, Title, Review
 
@@ -28,32 +28,11 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ('name', 'slug')
 
 
-class GenreTitleSerializer(serializers.ModelSerializer):
-    """Сериализатор промежуточной модели GenreTitle"""
-
-    genre = serializers.SlugRelatedField(
-        slug_field='slug',
-        queryset=Genre.objects.all()
-    )
-    title = serializers.SlugRelatedField(
-        slug_field='name',
-        queryset=Title.objects.all()
-    )
-
-    class Meta:
-        model = GenreTitle
-        fields = ('title', 'genre')
-
-    def to_representation(self, value):
-        return {'name': str(value.genre.name), 'slug': str(value.genre.slug)}
-
-
 class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор модели Title для отображения"""
 
     category = CategorySerializer()
-    # genre = GenreSerializer(source='genre_title__genre__slug', many=True)
-    genre = GenreTitleSerializer(source='genre_title', many=True)
+    genre = GenreSerializer(many=True)
     rating = serializers.FloatField(read_only=True)
 
     class Meta:
@@ -136,14 +115,6 @@ class TitleCreateUpdateSerializer(serializers.ModelSerializer):
         if value > year:
             raise serializers.ValidationError()
         return value
-
-    def create(self, validated_data):
-        genres_data = validated_data.pop('genre')
-        title = Title.objects.create(**validated_data)
-        for genre in genres_data:
-            if Genre.objects.filter(name=genre).exists:
-                GenreTitle.objects.create(title=title, genre=genre)
-        return title
 
     def to_representation(self, instance):
         return TitleSerializer(instance=instance).data

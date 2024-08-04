@@ -30,6 +30,23 @@ class Genre(models.Model):
         return self.name[:DISPLAY_LENGTH]
 
 
+class GenreTitle(models.Model):
+    title = models.ForeignKey(
+        'Title', on_delete=models.CASCADE
+    )
+    genre = models.ForeignKey(
+        Genre, null=True, on_delete=models.SET_NULL
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('title', 'genre'), name='unique_genre_title'
+            )
+        ]
+        default_related_name = 'genre_title'
+
+
 class Title(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=NAME_MAX_LENGTH)
@@ -41,13 +58,14 @@ class Title(models.Model):
         related_name='titles'
     )
     description = models.TextField(null=True, default=None, blank=True)
+    genre = models.ManyToManyField(to=Genre, through=GenreTitle)
 
     class Meta:
         verbose_name = 'Тайтл'
         verbose_name_plural = 'Тайтлы'
 
     def __str__(self):
-        return self.name
+        return self.name[:DISPLAY_LENGTH]
 
 
 class Review(models.Model):
@@ -85,20 +103,3 @@ class Comments(models.Model):
 
     def __str__(self):
         return self.text
-
-
-class GenreTitle(models.Model):
-    title = models.ForeignKey(
-        Title, on_delete=models.CASCADE
-    )
-    genre = models.ForeignKey(
-        Genre, null=True, on_delete=models.SET_NULL
-    )
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=('title', 'genre'), name='unique_genre_title'
-            )
-        ]
-        default_related_name = 'genre_title'
