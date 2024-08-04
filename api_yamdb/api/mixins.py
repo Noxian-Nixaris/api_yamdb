@@ -19,9 +19,15 @@ class PermissionMixin:
 class BaseGetQuerysetMixin:
     """Миксин для получения queryset на основе параметров из URL."""
 
-    def get_base_queryset(self, model, url_kwarg, related_name):
-        obj_id = self.kwargs.get(url_kwarg)
-        obj = get_object_or_404(model, id=obj_id)
+    def get_base_queryset(
+            self, model, url_kwarg_one, related_name, url_kwarg_two=None
+        ):
+        obj_id = self.kwargs.get(url_kwarg_one)
+        if url_kwarg_two:
+            obj_two_id = self.kwargs.get(url_kwarg_two)
+            obj = get_object_or_404(model, title=obj_two_id, id=obj_id)
+        else:
+            obj = get_object_or_404(model, id=obj_id)
         return getattr(obj, related_name).all()
 
 
@@ -31,7 +37,18 @@ class BaseCreateMixin:
      связанного объекта через URL-параметр.
     """
 
-    def perform_create(self, serializer, model, url_kwarg, related_field):
-        obj_id = self.kwargs.get(url_kwarg)
-        obj = get_object_or_404(model, id=obj_id)
+    def perform_create(
+            self,
+            serializer,
+            model,
+            url_kwarg_one,
+            related_field,
+            url_kwarg_two=None
+    ):
+        obj_id = self.kwargs.get(url_kwarg_one)
+        if url_kwarg_two:
+            obj_two_id = self.kwargs.get(url_kwarg_two)
+            obj = get_object_or_404(model, title=obj_two_id, id=obj_id)
+        else:
+            obj = get_object_or_404(model, id=obj_id)
         serializer.save(**{related_field: obj}, author=self.request.user)

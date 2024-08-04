@@ -92,10 +92,14 @@ class CommentViewSet(
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_queryset(self):
-        return self.get_base_queryset(Review, 'review_id', 'comments')
+        return self.get_base_queryset(
+            Review, 'review_id', 'comments', url_kwarg_two='title_id'
+        )
 
     def perform_create(self, serializer):
-        super().perform_create(serializer, Review, 'review_id', 'review')
+        super().perform_create(
+            serializer, Review, 'review_id', 'review', url_kwarg_two='title_id'
+        )
 
 
 class GenreViewSet(ListCreateDestroyViewSet):
