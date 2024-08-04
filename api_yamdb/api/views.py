@@ -1,4 +1,5 @@
 from django.db.models import Avg
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, viewsets
 from rest_framework.mixins import (
     CreateModelMixin,
@@ -27,56 +28,42 @@ class ListCreateDestroyViewSet(
     pass
 
 
-class TitleViewSet(viewsets.ModelViewSet):
+class BaseViewSetClass(viewsets.ModelViewSet):
+    permission_classes = (IsAdminOrReadOnly,)
+    pagination_class = CategoryPagination
+    ordering = ('name', 'id',)
+
+
+
+class TitleViewSet(BaseViewSetClass):
     """Вьюсет для работы с произведениями."""
 
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
     ).order_by('name')
-    permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = CategoryPagination
-    ordering = ('name', 'id',)
+    # permission_classes = (IsAdminOrReadOnly,)
+    # pagination_class = CategoryPagination
+    # ordering = ('name', 'id',)
     http_method_names = ['get', 'post', 'patch', 'delete']
-    filterset_class = (TitleFilter,)
-    filterser_fields = ('name', 'year', 'category', 'genre_title__genre__slug')
+    filterset_class = TitleFilter
+    filter_backends = (filters.OrderingFilter, DjangoFilterBackend)
 
     def get_serializer_class(self):
         if self.action in ['create', 'update', 'partial_update']:
             return TitleCreateUpdateSerializer
         return TitleSerializer
 
-    # def get_queryset(self):
-    #     titles = Title.objects.all()
-    #     filters = self.request.query_params
-    #     if 'genre' in filters:
-    #         filter_field = filters.get('genre')
-    #         titles = titles.filter(
-    #             genre_title__genre__slug=filter_field
-    #         )
-    #     if 'category' in filters:
-    #         filter_field = filters.get('category')
-    #         titles = titles.filter(category__slug=filter_field)
-    #     if 'name' in filters:
-    #         filter_field = filters.get('name')
-    #         titles = titles.filter(name=filter_field)
-    #     if 'year' in filters:
-    #         filter_field = filters.get('year')
-    #         titles = titles.filter(
-    #             year=filter_field
-    #         )
-    #     return titles
 
-
-class CategoryViewSet(ListCreateDestroyViewSet):
+class CategoryViewSet(BaseViewSetClass):
     """Вьюсет для работы с категориями."""
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
-    permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = CategoryPagination
-    ordering = ('name', 'id',)
+    # permission_classes = (IsAdminOrReadOnly,)
+    # pagination_class = CategoryPagination
+    # ordering = ('name', 'id',)
     lookup_field = 'slug'
 
 
@@ -119,13 +106,13 @@ class CommentViewSet(
         super().perform_create(serializer, Review, 'review_id', 'review')
 
 
-class GenreViewSet(ListCreateDestroyViewSet):
+class GenreViewSet(ListCreateDestroyViewSet, BaseViewSetClass):
     """Вьюсет для работы с жанрами."""
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (IsAdminOrReadOnly,)
-    pagination_class = CategoryPagination
+    # permission_classes = (IsAdminOrReadOnly,)
+    # pagination_class = CategoryPagination
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
