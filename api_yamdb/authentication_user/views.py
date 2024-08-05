@@ -20,6 +20,12 @@ class SignUpViewSet(GenericViewSet, CreateModelMixin):
         """Регистрация пользователя."""
         serializer = SignUpSerializer(data=request.data,
                                       context={'request': request})
+        email = request.data.get('email')
+        username = request.data.get('username')
+        existing_email = User.objects.filter(email=email).exists()
+        existing_username = User.objects.filter(username=username).exists()
+        if existing_username and existing_email:
+            return Response(status.HTTP_200_OK)
         if serializer.is_valid():
             user = serializer.save()
             user.save()
