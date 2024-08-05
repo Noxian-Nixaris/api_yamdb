@@ -31,5 +31,5 @@ class Command(BaseCommand):
                 # for row in reader:
                 #     print(row)
                 instances = (models_list[i](**row) for row in reader)
-                
+
                 models_list[i].objects.bulk_create(instances)
