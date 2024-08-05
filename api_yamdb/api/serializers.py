@@ -6,7 +6,7 @@ from rest_framework import serializers
 from core.constants import (
     CHOICES_SCORE, MAX_SCORE, MIN_SCORE
 )
-from reviews.models import Category, Comments, Genre, GenreTitle, Title, Review
+from reviews.models import Category, Comments, Genre, Title, Review
 
 
 User = get_user_model()
