@@ -17,11 +17,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
     'rest_framework_simplejwt',
-    'authuser',
-    'api',
+    'authentication_user',
     'reviews',
-    'api_yamdb',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -40,6 +40,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 15,
 }
@@ -69,6 +70,8 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=60),
 
 }
+
+EMAIL_HOST_USER = 'api_yamdb79@tutamail.com'
 
 ROOT_URLCONF = 'api_yamdb.urls'
 
@@ -113,9 +116,10 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-AUTH_USER_MODEL = 'authuser.User'
 
-LANGUAGE_CODE = 'en-us'
+AUTH_USER_MODEL = 'authentication_user.User'
+
+LANGUAGE_CODE = 'ru-RU'
 
 TIME_ZONE = 'UTC'
 
