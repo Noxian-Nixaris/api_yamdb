@@ -1,6 +1,6 @@
 from rest_framework.permissions import BasePermission, SAFE_METHODS
 
-from core.constants import ADMIN, MODERATOR
+from core.constants import ROLE_ADMIN, ROLE_MODERATOR
 
 
 class IsAdminOrReadOnly(BasePermission):
@@ -8,18 +8,23 @@ class IsAdminOrReadOnly(BasePermission):
         return (
             request.method in SAFE_METHODS
             or request.user.is_authenticated
-            and request.user.role == ADMIN
+            and request.user.role == ROLE_ADMIN
         )
 
 
 class IsAdmin(BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == ADMIN
+        return (
+            request.user.is_authenticated and request.user.role == ROLE_ADMIN
+        )
 
 
 class IsModerator(BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == MODERATOR
+        return (
+            request.user.is_authenticated and
+            request.user.role == ROLE_MODERATOR
+        )
 
 
 class IsAuthModAdmOrReadOnly(BasePermission):
@@ -35,6 +40,6 @@ class IsAuthModAdmOrReadOnly(BasePermission):
         return (
             request.method in SAFE_METHODS
             or obj.author == request.user
-            or request.user.role == MODERATOR
-            or request.user.role == ADMIN
+            or request.user.role == ROLE_MODERATOR
+            or request.user.role == ROLE_ADMIN
         )
