@@ -94,8 +94,8 @@ class Review(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
-        verbose_name = 'Категория'
-        verbose_name_plural = 'Категории'
+        verbose_name = 'Обзор'
+        verbose_name_plural = 'Обзоры'
         ordering = ('pub_date', 'id')
         default_related_name = 'reviews'
         constraints = [
