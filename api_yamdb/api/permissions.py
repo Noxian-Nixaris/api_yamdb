@@ -33,9 +33,6 @@ class IsAuthModAdmOrReadOnly(BasePermission):
      позволяет изменения автору, админу или модератору.
     """
 
-    def has_permission(self, request, view):
-        return request.user.is_authenticated
-
     def has_object_permission(self, request, view, obj):
         return (
             request.method in SAFE_METHODS
