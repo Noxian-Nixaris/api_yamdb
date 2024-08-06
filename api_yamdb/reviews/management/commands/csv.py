@@ -28,8 +28,6 @@ class Command(BaseCommand):
                 f'static/data/{file_list[i]}.csv', newline='', encoding='utf-8'
             ) as csvfile:
                 reader = csv.DictReader(csvfile)
-                # for row in reader:
-                #     print(row)
                 instances = (models_list[i](**row) for row in reader)
 
                 models_list[i].objects.bulk_create(instances)
