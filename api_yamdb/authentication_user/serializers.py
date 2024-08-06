@@ -17,6 +17,8 @@ class SignUpSerializer(serializers.ModelSerializer):
         existing_username = User.objects.filter(username=username).exists()
         if existing_email and not existing_username:
             raise serializers.ValidationError('Почта уже занята')
+        if existing_email and not existing_username:
+            raise serializers.ValidationError('Почта уже занята')
         if existing_username and not existing_email:
             raise serializers.ValidationError('Имя пользователя уже занято')
         return data

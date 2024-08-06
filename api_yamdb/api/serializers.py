@@ -6,7 +6,7 @@ from rest_framework import serializers
 from core.constants import (
     CHOICES_SCORE, MAX_SCORE, MIN_SCORE
 )
-from reviews.models import Category, Comments, Genre, GenreTitle, Title, Review
+from reviews.models import Category, Comments, Genre, Review, Title
 
 
 User = get_user_model()
@@ -33,7 +33,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
     category = CategorySerializer()
     genre = GenreSerializer(many=True)
-    rating = serializers.FloatField(read_only=True)
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Title
@@ -52,7 +52,6 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'text', 'author', 'pub_date')
         model = Comments
-        read_only_fields = ('review',)
 
 
 class ReviewSerializer(serializers.ModelSerializer):

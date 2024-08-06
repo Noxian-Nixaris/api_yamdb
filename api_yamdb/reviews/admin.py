@@ -19,7 +19,11 @@ class GenreAdmin(admin.ModelAdmin):
 
 class TitleAdmin(admin.ModelAdmin):
     model = Title
-    list_display = ('name', 'year', 'category', 'description')
+    list_display = ('name', 'year', 'category', 'description', 'get_genre')
+    list_editable = ('category',)
+
+    def get_genre(self, obj):
+        return [genre.name for genre in obj.genre.all()]
 
 
 class ReviewAdmin(admin.ModelAdmin):

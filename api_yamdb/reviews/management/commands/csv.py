@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand
 from reviews.models import (
     Category, Genre, GenreTitle, Title, Review, Comments
 )
+from core.constants import STATIC_PASS
 
 User = get_user_model()
 
@@ -16,20 +17,19 @@ class Command(BaseCommand):
         parser.add_argument("csv_to_db")
 
     def handle(self, *args, **options):
-        models_list = (
-            User, Category, Genre, Title, Review, Comments, GenreTitle
-        )
-        file_list = (
-            'users', 'category', 'genre', 'title',
-            'review', 'comments', 'genretitle'
-        )
-        for i in range(7):
+        transfer_dict = {
+            'users': User,
+            'category': Category,
+            'genre': Genre,
+            'title': Title,
+            'review': Review,
+            'comments': Comments,
+            'genretitle': GenreTitle
+        }
+        for file in transfer_dict:
             with open(
-                f'static/data/{file_list[i]}.csv', newline='', encoding='utf-8'
+                f'{STATIC_PASS}{file}.csv', newline='', encoding='utf-8'
             ) as csvfile:
                 reader = csv.DictReader(csvfile)
-                # for row in reader:
-                #     print(row)
-                instances = (models_list[i](**row) for row in reader)
-                
-                models_list[i].objects.bulk_create(instances)
+                instances = (transfer_dict[file](**row) for row in reader)
+                transfer_dict[file].objects.bulk_create(instances)
