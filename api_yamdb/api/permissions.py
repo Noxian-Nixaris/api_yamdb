@@ -22,8 +22,8 @@ class IsAdmin(BasePermission):
 class IsModerator(BasePermission):
     def has_permission(self, request, view):
         return (
-            request.user.is_authenticated and
-            request.user.role == ROLE_MODERATOR
+            request.user.is_authenticated
+            and request.user.role == ROLE_MODERATOR
         )
 
 
@@ -32,9 +32,6 @@ class IsAuthModAdmOrReadOnly(BasePermission):
     Пользовательский класс разрешения, который
      позволяет изменения автору, админу или модератору.
     """
-
-    def has_permission(self, request, view):
-        return request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
         return (

@@ -1,6 +1,5 @@
-from django.db import IntegrityError
 from django.shortcuts import get_object_or_404
-from rest_framework import exceptions, permissions
+from rest_framework import permissions
 
 from .permissions import IsAuthModAdmOrReadOnly
 
@@ -12,7 +11,10 @@ class PermissionMixin:
         if self.action in ['list', 'retrieve']:
             return (permissions.AllowAny(),)
         if self.action in ['partial_update', 'destroy']:
-            return (IsAuthModAdmOrReadOnly(),)
+            return (
+                permissions.IsAuthenticatedOrReadOnly(),
+                IsAuthModAdmOrReadOnly(),
+            )
         return (permissions.IsAuthenticated(),)
 
 
@@ -20,8 +22,8 @@ class BaseGetQuerysetMixin:
     """Миксин для получения queryset на основе параметров из URL."""
 
     def get_base_queryset(
-            self, model, url_kwarg_one, related_name, url_kwarg_two=None
-        ):
+        self, model, url_kwarg_one, related_name, url_kwarg_two=None
+    ):
         obj_id = self.kwargs.get(url_kwarg_one)
         if url_kwarg_two:
             obj_two_id = self.kwargs.get(url_kwarg_two)
