@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from core.constants import (
-    CHOICES_SCORE, MAX_SCORE, MIN_SCORE
+    CHOICES_SCORE, DEFAULT_SCORE, MAX_SCORE, MIN_SCORE
 )
 from reviews.models import Category, Comments, Genre, Review, Title
 
@@ -33,7 +33,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
     category = CategorySerializer()
     genre = GenreSerializer(many=True)
-    rating = serializers.IntegerField(read_only=True)
+    rating = serializers.IntegerField(default=DEFAULT_SCORE, read_only=True)
 
     class Meta:
         model = Title

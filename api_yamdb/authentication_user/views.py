@@ -24,13 +24,12 @@ class SignUpViewSet(GenericViewSet, CreateModelMixin):
                                       context={'request': request})
         email = request.data.get('email')
         username = request.data.get('username')
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             user, created = User.objects.get_or_create(email=email,
                                                        username=username)
             if created:
                 send_confirmation_email(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        raise ValidationError(serializer.errors)
 
 
 class TokenView(APIView):
@@ -41,13 +40,12 @@ class TokenView(APIView):
         serializer = TokenSerializer(data=request.data,
                                      context={'request': request})
         username = request.data.get('username')
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             user = get_object_or_404(User, username=username)
             refresh = RefreshToken.for_user(user)
             token = {'refresh': str(refresh),
                      'access': str(refresh.access_token)}
             return Response(token, status=status.HTTP_200_OK)
-        raise ValidationError(serializer.errors)
 
 
 class UserViewSet(viewsets.ModelViewSet):
