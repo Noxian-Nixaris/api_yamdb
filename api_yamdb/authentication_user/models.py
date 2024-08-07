@@ -31,7 +31,6 @@ class User(AbstractUser):
         max_length=CONFIRMATION_CODE_MAX_LENGTH,
         blank=True,
         verbose_name='Код подтверждения',
-        default=str(randint(100000, 999999))
     )
     role = models.CharField(
         max_length=ROLE_MAX_LENGTH,
