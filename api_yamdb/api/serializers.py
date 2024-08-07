@@ -6,7 +6,7 @@ from rest_framework import serializers
 from core.constants import (
     CHOICES_SCORE, MAX_SCORE, MIN_SCORE
 )
-from reviews.models import Category, Comments, Genre, Title, Review
+from reviews.models import Category, Comments, Genre, Review, Title
 
 
 User = get_user_model()
@@ -33,7 +33,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
     category = CategorySerializer()
     genre = GenreSerializer(many=True)
-    rating = serializers.FloatField(read_only=True)
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Title
@@ -52,7 +52,6 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'text', 'author', 'pub_date')
         model = Comments
-        read_only_fields = ('review',)
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -76,18 +75,16 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         request = self.context['request']
-        author = request.user
-        title_id = self.context['view'].kwargs.get('title_id')
-        existing_review = Review.objects.filter(
-            author=author,
-            title_id=title_id
-        )
-        if request.method == 'PATCH':
-            return data
-        if existing_review.exists():
-            raise serializers.ValidationError(
-                'Вы уже оставили отзыв на это произведение'
-            )
+        if request.method == 'POST':
+            author = request.user
+            title_id = self.context['view'].kwargs.get('title_id')
+            if Review.objects.filter(
+                author=author,
+                title_id=title_id
+            ).exists():
+                raise serializers.ValidationError(
+                    'Вы уже оставили отзыв на это произведение'
+                )
         return data
 
 

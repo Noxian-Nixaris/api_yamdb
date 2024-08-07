@@ -11,7 +11,10 @@ class PermissionMixin:
         if self.action in ['list', 'retrieve']:
             return (permissions.AllowAny(),)
         if self.action in ['partial_update', 'destroy']:
-            return (IsAuthModAdmOrReadOnly(),)
+            return (
+                permissions.IsAuthenticatedOrReadOnly(),
+                IsAuthModAdmOrReadOnly(),
+            )
         return (permissions.IsAuthenticated(),)
 
 
