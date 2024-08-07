@@ -18,7 +18,7 @@ from api.serializers import (
     TitleSerializer
 )
 from api.filters import TitleFilter
-from api.permissions import IsAdminOrReadOnly
+from api.permissions import IsAdminOrReadOnly, IsAuthModAdmOrReadOnly
 from reviews.models import Category, Genre, Review, Title
 
 
@@ -88,7 +88,7 @@ class CommentViewSet(
     """Вьюсет для работы с комментариями."""
 
     serializer_class = CommentSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_queryset(self):
