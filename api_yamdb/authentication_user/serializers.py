@@ -1,10 +1,10 @@
 from rest_framework import serializers
+
+from authentication_user.models import User
 from core.constants import (
     MAX_LENGTH, EMAIL_MAX_LENGTH,
     PATTERN_VALIDATOR, username_not_me_validator,
 )
-
-from .models import User
 
 
 class SignUpSerializer(serializers.Serializer):
