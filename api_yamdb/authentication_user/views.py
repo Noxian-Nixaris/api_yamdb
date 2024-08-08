@@ -7,7 +7,6 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.views import APIView
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
 
 from .models import User
 from .permissions import IsAdminOrSuperuser
