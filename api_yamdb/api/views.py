@@ -18,7 +18,7 @@ from api.serializers import (
     TitleSerializer
 )
 from api.filters import TitleFilter
-from api.permissions import IsAdminOrReadOnly, IsAuthModAdmOrReadOnly
+from api.permissions import IsAdminOrReadOnly
 from reviews.models import Category, Genre, Review, Title
 
 

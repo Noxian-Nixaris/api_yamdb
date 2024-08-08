@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User
+
+from authentication_user.models import User
 
 ADDITIONAL_USER_FIELDS = (
     (None, {'fields': ('bio', 'confirmation_code', 'role')}),

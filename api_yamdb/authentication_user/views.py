@@ -29,7 +29,6 @@ class SignUpViewSet(GenericViewSet, CreateModelMixin):
                                                        username=username)
             send_confirmation_email(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        raise ValidationError(serializer.errors)
 
 
 class TokenView(APIView):
@@ -46,7 +45,6 @@ class TokenView(APIView):
             token = {'refresh': str(refresh),
                      'access': str(refresh.access_token)}
             return Response(token, status=status.HTTP_200_OK)
-        raise ValidationError(serializer.errors)
 
 
 class UserViewSet(viewsets.ModelViewSet):
