@@ -7,12 +7,11 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework.views import APIView
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
 
-from .models import User
-from .permissions import IsAdminOrSuperuser
-from .serializers import UserSerializer, SignUpSerializer, TokenSerializer
-from .utils import send_confirmation_email
+from authentication_user.models import User
+from authentication_user.permissions import IsAdminOrSuperuser
+from authentication_user.serializers import UserSerializer, SignUpSerializer, TokenSerializer
+from authentication_user.utils import send_confirmation_email
 
 
 class SignUpViewSet(GenericViewSet, CreateModelMixin):
@@ -24,11 +23,12 @@ class SignUpViewSet(GenericViewSet, CreateModelMixin):
                                       context={'request': request})
         email = request.data.get('email')
         username = request.data.get('username')
-        if serializer.is_valid(raise_exception=True):
-            user, created = User.objects.get_or_create(email=email,
-                                                       username=username)
-            send_confirmation_email(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer.is_valid(raise_exception=True)
+        user, created = User.objects.get_or_create(
+            email=email, username=username
+        )
+        send_confirmation_email(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class TokenView(APIView):
@@ -39,12 +39,13 @@ class TokenView(APIView):
         serializer = TokenSerializer(data=request.data,
                                      context={'request': request})
         username = request.data.get('username')
-        if serializer.is_valid(raise_exception=True):
-            user = get_object_or_404(User, username=username)
-            refresh = RefreshToken.for_user(user)
-            token = {'refresh': str(refresh),
-                     'access': str(refresh.access_token)}
-            return Response(token, status=status.HTTP_200_OK)
+        serializer.is_valid(raise_exception=True)
+        user = get_object_or_404(User, username=username)
+        refresh = RefreshToken.for_user(user)
+        token = {
+            'refresh': str(refresh), 'access': str(refresh.access_token)
+        }
+        return Response(token, status=status.HTTP_200_OK)
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -63,7 +64,6 @@ class UserViewSet(viewsets.ModelViewSet):
         user = request.user
         serializer = UserSerializer(user, data=request.data, partial=True,
                                     context={'request': request})
-        if serializer.is_valid(raise_exception=True):
-            serializer.save(role=self.request.user.role)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(role=self.request.user.role)
+        return Response(serializer.data, status=status.HTTP_200_OK)
