@@ -1,10 +1,10 @@
 from django.contrib.auth import get_user_model
-from django.core.validators import MaxValueValidator
 from django.db import models
 
 from core.constants import (
-    ACTUAL_YEAR, CHOICES_SCORE, DISPLAY_LENGTH, NAME_MAX_LENGTH
+    CHOICES_SCORE, DISPLAY_LENGTH, NAME_MAX_LENGTH
 )
+from core.validators import year_check
 
 User = get_user_model()
 
@@ -55,7 +55,7 @@ class GenreTitle(models.Model):
 class Title(models.Model):
     name = models.CharField(max_length=NAME_MAX_LENGTH, verbose_name='Имя')
     year = models.SmallIntegerField(
-        validators=[MaxValueValidator(ACTUAL_YEAR)], verbose_name='Год'
+        validators=[year_check], verbose_name='Год'
     )
     category = models.ForeignKey(
         Category,

@@ -1,5 +1,3 @@
-import datetime
-
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 
@@ -40,5 +38,5 @@ CHOICES_SCORE = (
 DISPLAY_LENGTH = 30
 MIN_SCORE = 1
 MAX_SCORE = 10
-ACTUAL_YEAR = int(datetime.date.today().year)
 STATIC_PASS = 'static/data/'
+DEFAULT_SCORE = 1
