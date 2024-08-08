@@ -10,7 +10,9 @@ from rest_framework.decorators import action
 
 from authentication_user.models import User
 from authentication_user.permissions import IsAdminOrSuperuser
-from authentication_user.serializers import UserSerializer, SignUpSerializer, TokenSerializer
+from authentication_user.serializers import (
+    UserSerializer, SignUpSerializer, TokenSerializer
+)
 from authentication_user.utils import send_confirmation_email
 
 
