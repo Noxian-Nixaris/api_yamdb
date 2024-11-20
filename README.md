@@ -45,13 +45,13 @@ python3 manage.py csv csv_to_db
 ```
 python3 manage.py runserver
 ```
-##Примеры.
+## Примеры.
 Открыть документацию проекта:
 ```
 /redoc/
 ```
 
-###Зареоистрировать пользователя:
+### Зареоистрировать пользователя:
 POST
 ```
 api/v1/auth/signup/
@@ -74,7 +74,7 @@ POST
 }
 ```
 
-###Получить список произведений.
+### Получить список произведений.
 GET
 ```
 /api/v1/titles/
@@ -101,7 +101,7 @@ GET/DELETE
 /api/v1/titles/{titles_id}/
 ```
 
-###Получить список отзывов к произведению:
+### Получить список отзывов к произведению:
 GET
 ```
 /api/v1/titles/{title_id}/reviews/
@@ -123,7 +123,7 @@ GET/DELETE
 /api/v1/titles/{title_id}/reviews/{review_id}/
 ```
 
-###Получить список комментариев:
+### Получить список комментариев:
 GET
 ```
 /api/v1/titles/{title_id}/reviews/{review_id}/comments/
@@ -145,7 +145,7 @@ GET/DELETE
 /api/v1/titles/{title_id}/reviews/{review_id}/comments/{comment_id}/
 ```
 
-##Авторы:
-Виктор Желтов
-Владимир Рубец
-Егор Лазарев
+## Авторы:
+1. Виктор Желтов
+2. Владимир Рубец
+3. Егор Лазарев
