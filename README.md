@@ -11,7 +11,7 @@ Django REST Framework
 ## Установка.
 
 ```
-git clone https://https://github.com/Noxian-Nixaris/api_yamdb.git
+git clone https://github.com/Noxian-Nixaris/api_yamdb.git
 ```
 ```
 cd api_yamdb
